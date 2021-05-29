@@ -1,61 +1,99 @@
 package main
 
 import (
-	"html/template"
-	"io/ioutil"
-	"log"
+	"fmt"
 	"net/http"
-	"path/filepath"
-	"strings"
+
+	"github.com/urfave/negroni"
+	"github.com/xyproto/onthefly"
+	"github.com/xyproto/tinysvg"
 )
 
-var templateDirs = []string{"tmpl", "partials"}
-var templates *template.Template
+// Generate a new SVG image
+func svgImage() []byte {
+	document, svg := tinysvg.NewTinySVG(128, 64)
+	svg.Describe("Hello SVG")
 
-func getTemplates() (*template.Template, error) {
-	var allFiles []string
-	for _, dir := range templateDirs {
-		files2, err := ioutil.ReadDir(dir)
-		if err != nil {
-			return nil, err
-		}
-		for _, file := range files2 {
-			filename := file.Name()
-			if strings.HasSuffix(filename, ".html") {
-				filePath := filepath.Join(dir, filename)
-				allFiles = append(allFiles, filePath)
-			}
-		}
-	}
+	// x, y, radius, color
+	svg.Circle(30, 10, 5, "red")
+	svg.Circle(110, 30, 2, "green")
+	svg.Circle(80, 40, 7, "blue")
 
-	return template.New("").ParseFiles(allFiles...)
+	// x, y, font size, font family, text and color
+	svg.Text(3, 60, 6, "Courier", "There will be cake", "#394851")
+
+	return document.Bytes()
 }
 
-func init() {
-	var err error
-	templates, err = getTemplates()
-	if err != nil {
-		log.Fatal(err)
+// Generate a new onthefly Page (HTML5 and CSS combined)
+func indexPage(svgurl string) *onthefly.Page {
+
+	// Create a new HTML5 page, with CSS included
+	page := onthefly.NewHTML5Page("Demonstration")
+
+	// Add some text
+	page.AddContent(fmt.Sprintf("onthefly %.1f", onthefly.Version))
+
+	// Change the margin (em is default)
+	page.SetMargin(4)
+
+	// Change the font family
+	page.SetFontFamily("serif") // or: sans-serif
+
+	// Change the color scheme
+	page.SetColor("grey", "black")
+
+	// Include the generated SVG image on the page
+	body, err := page.GetTag("body")
+	if err == nil {
+		// CSS attributes for the body tag
+		body.AddStyle("font-size", "2em")
+		body.AddStyle("font-family", "sans-serif")
+
+		// Paragraph
+		p := body.AddNewTag("p")
+
+		// CSS style
+		p.AddStyle("margin-top", "2em")
+
+		// Image tag
+		img := p.AddNewTag("img")
+
+		// HTML attributes
+		img.AddAttrib("src", svgurl)
+		img.AddAttrib("alt", "Three circles")
+
+		// CSS style
+		img.AddStyle("width", "60%")
+		img.AddStyle("border", "4px solid white")
 	}
+
+	return page
 }
 
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	title := "Home"
-
-	data := map[string]interface{}{
-		"title": title,
-		//"header": "My Header",
-		//"footer": "My Footer",
-	}
-
-	err := templates.ExecuteTemplate(w, "homeHTML", data)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
+// Set up the paths and handlers then start serving.
 func main() {
-	http.HandleFunc("/", rootHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Println("onthefly ", onthefly.Version)
+
+	// Create a Negroni instance and a ServeMux instance
+	n := negroni.Classic()
+	mux := http.NewServeMux()
+
+	// Publish the generated SVG as "/circles.svg"
+	svgurl := "/circles.svg"
+	mux.HandleFunc(svgurl, func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Add("Content-Type", "image/svg+xml")
+		w.Write(svgImage())
+	})
+
+	// Generate a Page that includes the svg image
+	page := indexPage(svgurl)
+	// Publish the generated Page in a way that connects the HTML and CSS
+	page.Publish(mux, "/", "/style.css", false)
+
+	// Handler goes last
+	n.UseHandler(mux)
+
+	// Listen for requests at port 3000
+	n.Run(":8080")
 }

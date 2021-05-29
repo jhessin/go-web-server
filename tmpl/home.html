@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+  {{define "homeHTML"}}
+
+  {{template "headHTML" .}}
+
+  <body>
+    {{template "headerHTML" .}}
+    <p> This is where I put my site content. This will change though the
+    surrounding stuff will likely stay the same.</p>
+    {{template "footerHTML" .}}
+  </body>
+</html>
+
+{{ end }}

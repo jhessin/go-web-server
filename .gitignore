@@ -11,6 +11,9 @@
 *.dylib
 /build/
 
+# config file with sensitive info
+traffic.conf
+
 # Test binary, built with `go test -c`
 *.test
 

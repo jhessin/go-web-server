@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"net/http"
+
+	"github.com/pilu/traffic"
 )
 
 type Link struct {
@@ -45,17 +46,7 @@ func mustGetBase(title string) *Page {
 }
 
 // Home is a route that is used to load the home page
-func home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.Error(w, "404 not found.", http.StatusNotFound)
-		return
-	}
-
-	if r.Method != "GET" {
-		http.Error(w, "Method not supported", http.StatusBadRequest)
-		return
-	}
-
+func home(w traffic.ResponseWriter, r *traffic.Request) {
 	page := mustGetBase("Home")
 
 	if err := page.AddMarkdown("./tmpl/home.md"); err != nil {
@@ -66,17 +57,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 // account is a route for account management
-func account(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/account/" {
-		http.Error(w, "404 not found.", http.StatusNotFound)
-		return
-	}
-
-	if r.Method != "GET" {
-		http.Error(w, "Method not supported", http.StatusBadRequest)
-		return
-	}
-
+func account(w traffic.ResponseWriter, r *traffic.Request) {
 	// Generate the base page
 	page := mustGetBase("Account")
 
@@ -84,12 +65,7 @@ func account(w http.ResponseWriter, r *http.Request) {
 }
 
 // login is a route for Loging in to the account
-func login(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/login/" {
-		http.Error(w, "404 not found.", http.StatusNotFound)
-		return
-	}
-
+func login(w traffic.ResponseWriter, r *traffic.Request) {
 	if r.Method == "GET" {
 		// Generate the base page
 		page := mustGetBase("Account")

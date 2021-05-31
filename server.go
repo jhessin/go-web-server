@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 
-	"github.com/urfave/negroni"
+	"github.com/pilu/traffic"
 	"github.com/xyproto/onthefly"
 )
 
@@ -13,19 +12,15 @@ func main() {
 	fmt.Println("onthefly ", onthefly.Version)
 
 	// Create a Negroni instance and a ServeMux instance
-	n := negroni.Classic()
-	mux := http.NewServeMux()
+	router := traffic.New()
 
-	mux.HandleFunc("/", home)
-	mux.HandleFunc("/account/", account)
-	mux.HandleFunc("/login/", login)
+	router.Get("/", home)
+	router.Get("/account/", account)
+	router.Get("/login/", login)
 
 	// Publish the generated Page in a way that connects the HTML and CSS
 	//page.Publish(mux, "/", "/style.css", false)
 
-	// Handler goes last
-	n.UseHandler(mux)
-
-	// Listen for requests at port 3000
-	n.Run(":8080")
+	// Listen for requests at port set by traffic.conf
+	router.Run()
 }

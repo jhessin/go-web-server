@@ -13,9 +13,11 @@ func init() {
 func main() {
 	// Add the home route first
 	router.Get("/", home)
-	router.Get("/account/", account)
+	router.Get("/account/", authMiddleware(account))
+	//router.Get("/account/", account)
 	router.Get("/login/", login)
 	router.Post("/login/", login)
+	//router.Post("/login/", login)
 
 	// Publish the generated Page in a way that connects the HTML and CSS
 	//page.Publish(mux, "/", "/style.css", false)

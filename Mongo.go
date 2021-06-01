@@ -11,14 +11,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var router *traffic.Router
 var client *mongo.Client
 var users *mongo.Collection
 
 // initialize all global variables
 func init() {
-	// Create a Traffic router instance
-	router = traffic.New()
 
 	// get a context and set up the mongo server
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
@@ -49,19 +46,4 @@ func init() {
 	}
 
 	users = client.Database("sample-store", nil).Collection("users", nil)
-}
-
-// Set up the paths and handlers then start serving.
-func main() {
-	router.Get("/", home)
-	router.Get("/account/", account)
-	router.Get("/login/", login)
-	router.Post("/login/", login)
-
-	// Publish the generated Page in a way that connects the HTML and CSS
-	//page.Publish(mux, "/", "/style.css", false)
-
-	// Listen for requests at port set by traffic.conf
-	router.Run()
-
 }

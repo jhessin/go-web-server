@@ -9,6 +9,7 @@ require (
 	github.com/pilu/config v0.0.0-20131214182432-3eb99e6c0b9a // indirect
 	github.com/pilu/miniassert v0.0.0-20140522125902-bee63581261a // indirect
 	github.com/pilu/traffic v0.5.3
+	github.com/qor/auth v0.0.0-20200821034127-11d4c974507d // indirect
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/shaj13/go-guardian v1.5.11
 	go.mongodb.org/mongo-driver v1.5.2

@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/pilu/traffic"
 )
 
@@ -22,8 +20,8 @@ func login(w traffic.ResponseWriter, r *traffic.Request) {
 		password := r.PostForm.Get("password")
 
 		r.SetBasicAuth(email, password)
-		user, err := authenticator.Authenticate(r.Request)
-		fmt.Println(user, err)
+		//user, err := authenticator.Authenticate(r.Request)
+		//fmt.Println(user, err)
 	}
 
 }

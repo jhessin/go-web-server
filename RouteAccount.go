@@ -1,9 +1,11 @@
 package main
 
-import "net/http"
+import (
+	"github.com/pilu/traffic"
+)
 
 // account is a route for account management
-func account(w http.ResponseWriter, r *http.Request) {
+func account(w traffic.ResponseWriter, r *traffic.Request) {
 	// Generate the base page
 	page := newBaseDoc("Account Management")
 

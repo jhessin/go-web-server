@@ -8,8 +8,8 @@ import (
 )
 
 type User struct {
-	email     string
-	password  string
+	email     string `bson:"email"`
+	password  string `bson:"password"`
 	isAdmin   bool
 	timestamp primitive.D
 }
